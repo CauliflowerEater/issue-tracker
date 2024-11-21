@@ -18,9 +18,6 @@ const SimpleMDE = dynamic(() => import("react-simplemde-editor"), {
 type IssueForm = z.infer<typeof createIssueSchema>;
 
 const NewIssuePage = () => {
-  const [error, setError] = useState("");
-  const [isSubmitting, setSubmitting] = useState(false);
-
   const router = useRouter();
   const {
     register,
@@ -30,6 +27,21 @@ const NewIssuePage = () => {
   } = useForm<IssueForm>({
     resolver: zodResolver(createIssueSchema),
   });
+
+  const [error, setError] = useState("");
+  const [isSubmitting, setSubmitting] = useState(false);
+
+  const onSubmit = handleSubmit(async (data) => {
+    try {
+      setSubmitting(true);
+      await axios.post("/api/issues", data);
+      router.push("/issues");
+    } catch (error) {
+      setError("Unexpected issue occured!");
+      console.log(error);
+    }
+  });
+
   return (
     <div className="max-w-xl">
       {error && (
@@ -37,19 +49,7 @@ const NewIssuePage = () => {
           <Callout.Text>{error}</Callout.Text>
         </Callout.Root>
       )}
-      <form
-        className=" space-y-3"
-        onSubmit={handleSubmit(async (data) => {
-          try {
-            setSubmitting(true);
-            await axios.post("/api/issues", data);
-            router.push("/issues");
-          } catch (error) {
-            setError("Unexpected issue occured!");
-            console.log(error);
-          }
-        })}
-      >
+      <form className=" space-y-3" onSubmit={onSubmit}>
         <TextField.Root placeholder="title... " {...register("title")} />
         <ErrorMessage>{errors.title?.message}</ErrorMessage>
         <Controller
