@@ -4,7 +4,6 @@ import { createIssueSchema } from "@/app/ValidationSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, Callout, Spinner, TextField } from "@radix-ui/themes";
 import axios from "axios";
-import delay from "delay";
 import "easymde/dist/easymde.min.css";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
@@ -18,7 +17,7 @@ const SimpleMDE = dynamic(() => import("react-simplemde-editor"), {
 
 type IssueForm = z.infer<typeof createIssueSchema>;
 
-const NewIssuePage = async () => {
+const NewIssuePage = () => {
   const router = useRouter();
   const {
     register,
@@ -42,8 +41,6 @@ const NewIssuePage = async () => {
       console.log(error);
     }
   });
-
-  await delay(2000);
 
   return (
     <div className="max-w-xl">
