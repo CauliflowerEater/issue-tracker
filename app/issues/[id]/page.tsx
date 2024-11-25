@@ -15,6 +15,7 @@ const IssueDetailPage = async ({ params }: Props) => {
   });
 
   if (!issue) notFound();
+
   return (
     <div>
       <Heading>{issue.title}</Heading>
