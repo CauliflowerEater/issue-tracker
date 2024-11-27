@@ -11,9 +11,11 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
+import MDESkeleton from "./MDESkeleton";
 
 const SimpleMDE = dynamic(() => import("react-simplemde-editor"), {
   ssr: false,
+  loading: () => <MDESkeleton />,
 });
 
 type IssueFormData = z.infer<typeof issueSchema>;
