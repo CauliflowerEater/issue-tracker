@@ -9,13 +9,15 @@ const LoadingIssuesPage = () => {
       <NewIssueButton />
       <Table.Root variant="surface">
         <Table.Header>
-          <Table.ColumnHeaderCell>Issue</Table.ColumnHeaderCell>
-          <Table.ColumnHeaderCell className="hidden md:table-cell">
-            Status
-          </Table.ColumnHeaderCell>
-          <Table.ColumnHeaderCell className="hidden md:table-cell">
-            Created
-          </Table.ColumnHeaderCell>
+          <Table.Row>
+            <Table.ColumnHeaderCell>Issue</Table.ColumnHeaderCell>
+            <Table.ColumnHeaderCell className="hidden md:table-cell">
+              Status
+            </Table.ColumnHeaderCell>
+            <Table.ColumnHeaderCell className="hidden md:table-cell">
+              Created
+            </Table.ColumnHeaderCell>
+          </Table.Row>
         </Table.Header>
         <Table.Body>
           {issue.map((issue) => (

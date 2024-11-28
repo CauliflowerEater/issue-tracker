@@ -3,24 +3,33 @@ import prisma from "@/prisma/client";
 import { Table } from "@radix-ui/themes";
 import NewIssueButton from "./NewIssueButton";
 
+export const dynamic = "force-dynamic";
+
 const IssuesPage = async () => {
   const issues = await prisma.issue.findMany();
+
+  const serializedIssues = issues.map((issue) => ({
+    ...issue,
+    createdAt: issue.createdAt.toDateString(), //Serialize the time stamp to ISO string
+  }));
 
   return (
     <div>
       <NewIssueButton />
       <Table.Root variant="surface">
         <Table.Header>
-          <Table.ColumnHeaderCell>Issue</Table.ColumnHeaderCell>
-          <Table.ColumnHeaderCell className="hidden md:table-cell">
-            Status
-          </Table.ColumnHeaderCell>
-          <Table.ColumnHeaderCell className="hidden md:table-cell">
-            Created
-          </Table.ColumnHeaderCell>
+          <Table.Row>
+            <Table.ColumnHeaderCell>Issue</Table.ColumnHeaderCell>
+            <Table.ColumnHeaderCell className="hidden md:table-cell">
+              Status
+            </Table.ColumnHeaderCell>
+            <Table.ColumnHeaderCell className="hidden md:table-cell">
+              Created
+            </Table.ColumnHeaderCell>
+          </Table.Row>
         </Table.Header>
         <Table.Body>
-          {issues.map((issue) => (
+          {serializedIssues.map((issue) => (
             <Table.Row key={issue.id}>
               <Table.Cell>
                 <Link href={`/issues/${issue.id}`}>{issue.title}</Link>
@@ -32,7 +41,7 @@ const IssuesPage = async () => {
                 <IssueStatusBadge status={issue.status} />
               </Table.Cell>
               <Table.Cell className="hidden md:table-cell">
-                {issue.createdAt.toDateString()}
+                {issue.createdAt}
               </Table.Cell>
             </Table.Row>
           ))}
@@ -41,7 +50,5 @@ const IssuesPage = async () => {
     </div>
   );
 };
-//export const dynamic = "force-dynamic";
-export const revalidation = 0;
 
 export default IssuesPage;
