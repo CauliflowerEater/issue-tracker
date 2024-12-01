@@ -1,12 +1,24 @@
 import { IssueStatusBadge, Link } from "@/app/components";
 import prisma from "@/prisma/client";
+import { Status } from "@prisma/client";
 import { Table } from "@radix-ui/themes";
 import NewIssueButton from "./NewIssueButton";
 
 export const dynamic = "force-dynamic";
 
-const IssuesPage = async () => {
-  const issues = await prisma.issue.findMany();
+interface props {
+  searchParams: Promise<{ status: Status }>;
+}
+const IssuesPage = async ({ searchParams }: props) => {
+  const { status } = await searchParams;
+
+  const statuses = Object.values(Status);
+
+  const queryStatus = statuses.includes(status) ? status : undefined;
+
+  const issues = await prisma.issue.findMany({
+    where: { status: queryStatus },
+  });
 
   const serializedIssues = issues.map((issue) => ({
     ...issue,
