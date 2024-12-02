@@ -28,7 +28,7 @@ const IssuesPage = async ({ searchParams }: props) => {
 
   const queryStatus = statuses.includes(status) ? status : undefined;
 
-  const queryOrder = order === "asc" || "desc" ? order : "asc";
+  const queryOrder = order === "asc" || order === "desc" ? order : "asc";
 
   const queryOrderBy = columns.map((column) => column.value).includes(orderBy)
     ? { [orderBy]: queryOrder }
@@ -68,10 +68,10 @@ const IssuesPage = async ({ searchParams }: props) => {
                   </NextLink>
                 )}
 
-                {column.value === orderBy && order === "asc" && (
+                {column.value === orderBy && queryOrder === "asc" && (
                   <ArrowUpIcon className="inline" />
                 )}
-                {column.value === orderBy && order === "desc" && (
+                {column.value === orderBy && queryOrder === "desc" && (
                   <ArrowDownIcon className="inline" />
                 )}
               </Table.ColumnHeaderCell>
