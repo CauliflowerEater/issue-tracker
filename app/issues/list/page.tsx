@@ -1,4 +1,5 @@
 import { IssueStatusBadge, Link } from "@/app/components";
+import Pagination from "@/app/components/Pagination";
 import prisma from "@/prisma/client";
 import { Issue, Status } from "@prisma/client";
 import { ArrowDownIcon, ArrowUpIcon } from "@radix-ui/react-icons";
@@ -13,10 +14,11 @@ interface props {
     status: Status;
     orderBy: keyof Issue;
     order: "asc" | "desc";
+    page: string;
   }>;
 }
 const IssuesPage = async ({ searchParams }: props) => {
-  const { status, orderBy, order } = await searchParams;
+  const { status, orderBy, order, page } = await searchParams;
 
   const columns: { label: string; value: keyof Issue; className?: string }[] = [
     { label: "Issue", value: "title" },
@@ -27,6 +29,7 @@ const IssuesPage = async ({ searchParams }: props) => {
   const statuses = Object.values(Status);
 
   const queryStatus = statuses.includes(status) ? status : undefined;
+  const where = { status: queryStatus };
 
   const queryOrder = order === "asc" || order === "desc" ? order : "asc";
 
@@ -34,9 +37,19 @@ const IssuesPage = async ({ searchParams }: props) => {
     ? { [orderBy]: queryOrder }
     : undefined;
 
+  const currentPage = parseInt(page) || 1; //because the searchQuery page can be undefined.
+  const pageSize = 10;
+
   const issues = await prisma.issue.findMany({
-    where: { status: queryStatus },
+    where,
     orderBy: queryOrderBy,
+    skip: (currentPage - 1) * pageSize,
+    take: pageSize,
+  });
+
+  //used to count the number of records in the database.
+  const issueCount = await prisma.issue.count({
+    where,
   });
 
   return (
@@ -97,6 +110,11 @@ const IssuesPage = async ({ searchParams }: props) => {
           ))}
         </Table.Body>
       </Table.Root>
+      <Pagination
+        pageSize={pageSize}
+        currentPage={currentPage}
+        itemCount={issueCount}
+      />
     </div>
   );
 };
