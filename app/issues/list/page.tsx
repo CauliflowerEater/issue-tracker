@@ -1,7 +1,7 @@
 import { IssueStatusBadge, Link } from "@/app/components";
 import prisma from "@/prisma/client";
 import { Issue, Status } from "@prisma/client";
-import { ArrowUpIcon } from "@radix-ui/react-icons";
+import { ArrowDownIcon, ArrowUpIcon } from "@radix-ui/react-icons";
 import { Table } from "@radix-ui/themes";
 import NextLink from "next/link";
 import NewIssueButton from "./NewIssueButton";
@@ -9,10 +9,14 @@ import NewIssueButton from "./NewIssueButton";
 export const dynamic = "force-dynamic";
 
 interface props {
-  searchParams: Promise<{ status: Status; orderBy: keyof Issue }>;
+  searchParams: Promise<{
+    status: Status;
+    orderBy: keyof Issue;
+    order: "asc" | "desc";
+  }>;
 }
 const IssuesPage = async ({ searchParams }: props) => {
-  const { status, orderBy } = await searchParams;
+  const { status, orderBy, order } = await searchParams;
 
   const columns: { label: string; value: keyof Issue; className?: string }[] = [
     { label: "Issue", value: "title" },
@@ -24,14 +28,16 @@ const IssuesPage = async ({ searchParams }: props) => {
 
   const queryStatus = statuses.includes(status) ? status : undefined;
 
+  const queryOrder = order === "asc" || "desc" ? order : "asc";
+
+  const queryOrderBy = columns.map((column) => column.value).includes(orderBy)
+    ? { [orderBy]: queryOrder }
+    : undefined;
+
   const issues = await prisma.issue.findMany({
     where: { status: queryStatus },
+    orderBy: queryOrderBy,
   });
-
-  const serializedIssues = issues.map((issue) => ({
-    ...issue,
-    createdAt: issue.createdAt.toDateString(), //Serialize the time stamp to ISO string
-  }));
 
   return (
     <div>
@@ -44,20 +50,36 @@ const IssuesPage = async ({ searchParams }: props) => {
                 key={column.value}
                 className={column.className}
               >
-                <NextLink
-                  href={{
-                    query: { status, orderBy: column.value },
-                  }}
-                >
-                  {column.label}
-                </NextLink>
-                {column.value === orderBy && <ArrowUpIcon className="inline" />}
+                {order === "asc" ? (
+                  <NextLink
+                    href={{
+                      query: { status, orderBy: column.value, order: "desc" },
+                    }}
+                  >
+                    {column.label}
+                  </NextLink>
+                ) : (
+                  <NextLink
+                    href={{
+                      query: { status, orderBy: column.value, order: "asc" },
+                    }}
+                  >
+                    {column.label}
+                  </NextLink>
+                )}
+
+                {column.value === orderBy && order === "asc" && (
+                  <ArrowUpIcon className="inline" />
+                )}
+                {column.value === orderBy && order === "desc" && (
+                  <ArrowDownIcon className="inline" />
+                )}
               </Table.ColumnHeaderCell>
             ))}
           </Table.Row>
         </Table.Header>
         <Table.Body>
-          {serializedIssues.map((issue) => (
+          {issues.map((issue) => (
             <Table.Row key={issue.id}>
               <Table.Cell>
                 <Link href={`/issues/${issue.id}`}>{issue.title}</Link>
@@ -69,7 +91,7 @@ const IssuesPage = async ({ searchParams }: props) => {
                 <IssueStatusBadge status={issue.status} />
               </Table.Cell>
               <Table.Cell className="hidden md:table-cell">
-                {issue.createdAt}
+                {issue.createdAt.toDateString()}
               </Table.Cell>
             </Table.Row>
           ))}
