@@ -13,19 +13,17 @@ export default async function Home() {
     where: { status: "CLOSED" },
   });
 
+  const IssuesData = {
+    open: openIssues,
+    inProgress: inProgressIssues,
+    closed: closedIssues,
+  };
+
   return (
     <Grid columns={{ initial: "1", md: "2" }} gap={"5"}>
       <Flex direction={"column"} gap={"5"}>
-        <IssueSummary
-          open={openIssues}
-          inProgress={inProgressIssues}
-          closed={closedIssues}
-        />
-        <IssueChart
-          open={openIssues}
-          inProgress={inProgressIssues}
-          closed={closedIssues}
-        />
+        <IssueSummary IssuesData={IssuesData} />
+        <IssueChart IssuesData={IssuesData} />
       </Flex>
       <LatestIssues />
     </Grid>
