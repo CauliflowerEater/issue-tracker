@@ -5,3 +5,4 @@ const handler = NextAuth(authOption);
 
 export const GET=handler;
 export const POST=handler;
+//new way of export methods.
