@@ -14,7 +14,3 @@ const NewIssuePage = () => {
 
 export default NewIssuePage;
 
-export const metadata: Metadata = {
-  title: "Issue Tracker-New Issue",
-  description: "To initialize a new issue submit",
-};
